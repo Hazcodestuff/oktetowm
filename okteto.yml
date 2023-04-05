@@ -1,0 +1,5 @@
+name: whatsapp-bot
+image: node:latest
+command: ["npm", "start"]
+sync:
+  - .:/app
