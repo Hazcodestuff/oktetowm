@@ -1,38 +1,40 @@
-const { Client } = require('whatsapp-web.js');
-const Snoowrap = require('snoowrap');
-const { v4: uuidv4 } = require('uuid');
+import axios from 'axios';
+import fs from 'fs';
 
-const client = new Client();
-const reddit = new Snoowrap({
-  userAgent: 'myBot/1.0.0',
-  clientId: 'your_client_id',
-  clientSecret: 'your_client_secret',
-  username: 'your_reddit_username',
-  password: 'your_reddit_password',
-});
+let handler = async (m, { conn }) => {
+	try {
+		const credsFile = fs.readFileSync('./creds.json');
+		const creds = JSON.parse(credsFile);
 
-client.on('message', async (message) => {
-  if (message.body === '.meme') {
-    const meme = await reddit.getRandomSubmission('memes');
-    const mediaUrl = meme.url;
-    const chat = await message.getChat();
-    const mediaType = await client.getMessageMediaInfo(message);
+		const subReddit = 'dankmemes';
+		const response = await axios.get(`https://www.reddit.com/r/${subReddit}.json`, {
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0',
+			},
+		});
 
-    if (mediaType === 'image' || mediaType === 'video') {
-      const media = await client.downloadMedia(message);
-      chat.sendMessage(media, {
-        caption: 'Here is your meme!',
-        quotedMessageId: message.id._serialized,
-        sendMediaAsSticker: false,
-      });
-    } else {
-      chat.sendMessage(mediaUrl, {
-        caption: 'Here is your meme!',
-        quotedMessageId: message.id._serialized,
-        sendMediaAsSticker: false,
-      });
-    }
-  }
-});
+		const memes = response.data.data.children.filter((child) => {
+			const memeData = child.data;
+			return memeData.post_hint === 'image' && !memeData.over_18;
+		});
 
-client.initialize();
+		if (memes.length === 0) {
+			throw new Error('No memes found');
+		}
+
+		const randomIndex = Math.floor(Math.random() * memes.length);
+		const memeUrl = memes[randomIndex].data.url;
+
+		conn.sendFile(m.chat, memeUrl, '', `Here's a meme from r/${subReddit}:`, m, false, { thumbnail: Buffer.alloc(0) });
+		m.react('💀');
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+handler.help = ['meme'];
+handler.tags = ['img'];
+handler.command = ['meme'];
+handler.diamond = true;
+
+export default handler;
