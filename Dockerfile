@@ -13,11 +13,9 @@ WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm ci
+RUN npm install
 
 COPY . .
-
-RUN npm install axios fs
 
 EXPOSE 5000
 
