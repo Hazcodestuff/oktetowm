@@ -4,7 +4,8 @@ RUN apt-get update && \
   apt-get install -y \
   ffmpeg \
   imagemagick \
-  webp && \
+  webp \
+  libnss3 && \
   apt-get upgrade -y && \
   rm -rf /var/lib/apt/lists/*
 
