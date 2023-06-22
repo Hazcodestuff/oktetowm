@@ -18,6 +18,7 @@
   "author": "Hazcodestuff",
   "license": "MIT",
   "dependencies": {
+    "whatsapp-web.js": "^1.12.6",
     "@adiwajshing/baileys" : "npm:baileys@^6.0.9",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@bochilteam/scraper": "^2.0.0",
