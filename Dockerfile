@@ -8,11 +8,16 @@ RUN apt-get update && \
   apt-get upgrade -y && \
   rm -rf /var/lib/apt/lists/*
 
-COPY package.json .
+WORKDIR /app
 
-RUN npm install
+COPY package.json .
+COPY package-lock.json .
+
+RUN npm ci
 
 COPY . .
+
+RUN npm install axios fs
 
 EXPOSE 5000
 
