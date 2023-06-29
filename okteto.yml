@@ -1,17 +1,7 @@
-version: "3.9"
+version: "2"
 services:
-  web:
+  whatsapp-bot:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8000:5000"
-    volumes:
-      - .:/code
-      - logvolume01:/var/log
-    links:
-      - redis
-  redis:
-    image: redis
-volumes:
-  logvolume01: {}
+    command: ["node", "index.js"]
